@@ -1,0 +1,17 @@
+#ifndef DICOMDIRGENERATOR_H
+#define DICOMDIRGENERATOR_H
+
+
+class DICOMDIRGenerator{
+
+
+public:
+   DICOMDIRGenerator();
+   ~DICOMDIRGenerator();
+
+private:
+
+};
+
+#endif // DCMDIRGENERATOR_H
+

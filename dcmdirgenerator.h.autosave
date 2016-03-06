@@ -1,0 +1,7 @@
+#ifndef DCMDIRGENERATOR_H
+#define DCMDIRGENERATOR_H
+
+
+class DICOMDI
+#endif // DCMDIRGENERATOR_H
+
