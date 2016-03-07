@@ -1,0 +1,5 @@
+#ifndef DCMANONYMIZER_H
+#define DCMANONYMIZER_H
+
+#endif // DCMANONYMIZER_H
+
