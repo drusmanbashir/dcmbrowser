@@ -176,20 +176,20 @@ modality=tmp;
                    while ((strm.str()=="IMAGE")||((strm.str()=="IMAGE ")))
                      // if(tmp=="IMAGE")
                      {
-                     qDebug() << "          " << tmp ;
+                  //   qDebug() << "          " << tmp ;
 
 
                      //UID
                      strm.str("");
                      if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1511)))
                        sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1511)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
-                     qDebug() << "              IMAGE UID : " << tmp ;
+                //     qDebug() << "              IMAGE UID : " << tmp ;
 
                      //PATH de l'image
                      strm.str("");
                      if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1500)))
                        sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1500)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
-                     qDebug() << "              IMAGE PATH : " << tmp ;
+                //     qDebug() << "              IMAGE PATH : " << tmp ;
                      /*ADD TAG TO READ HERE*/
 
 
@@ -212,6 +212,11 @@ modality=tmp;
            }
          }
 
+
+}
+
+void DCMDump::anonymize()
+{
 
 }
 

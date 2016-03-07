@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <dcmdump.h>
 #include <QLabel>
+#include <QFileInfo>
 
 namespace Ui {
 class MainWindow;
@@ -18,10 +19,12 @@ public:
     ~MainWindow();
 
 
+
 private slots:
     void openDirBrowser();
     void about();
-
+    void parseToplevelDir();
+    void renameDirs(const QFileInfo& file);
 
 private:
     void createActions();
@@ -37,6 +40,7 @@ private:
     QLabel *infoLabel;
     QString toplevelDir;
 
+    QList<QFileInfo> paths;
 
 };
 

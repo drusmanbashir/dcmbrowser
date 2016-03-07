@@ -3,6 +3,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
+#include <QDirIterator>
+#include <QListWidget>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -83,8 +85,8 @@ void MainWindow::openDirBrowser()
 
  toplevelDir=   QFileDialog::getExistingDirectory(
             this,
-            tr("Select a Directory"),  QDir::currentPath()
-             QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks,
+            tr("Select a Directory"),  QDir::currentPath(),
+             QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks
           );
         if( !toplevelDir.isNull() )
         {
@@ -96,10 +98,37 @@ void MainWindow::openDirBrowser()
 
 void MainWindow::parseToplevelDir(){
 
+QStringList tmp;
 
-    QDirIterator it(toplevelDir, QStringList() << "DICOMDIR", QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext())
-        qDebug() << it.next();
+    QDirIterator it(toplevelDir,  QStringList()<<"DICOMDIR",QDir::Files,QDirIterator::Subdirectories);
+    while (it.hasNext()){
 
+
+            qDebug()<<it.next();
+     paths<<  it.fileInfo();
+     tmp<<it.filePath();
+
+    }
+    QListWidget *display = new QListWidget();
+    display->addItems(tmp);
+    display->show();
+
+
+    QListIterator<QFileInfo> i(paths);
+    while (i.hasNext()){
+        renameDirs(i.next());
+    }
+}
+
+void MainWindow::renameDirs(const QFileInfo& file){
+   QDir rambo(file.absoluteDir());
+   QFileInfo newName ;
+   DCMDump dump(file.absoluteFilePath());
+   QString oldDirName = file.absolutePath();
+   rambo.cdUp();
+   QString newDirName = rambo.path()+"/"+dump.outputPtID()+"_"+dump.outputModality()+"_"+dump.outputStudydate();
+   qDebug()<<oldDirName<<"\n"<<newDirName;
+   qDebug()<<"Dirname:"<<rambo.dirName()<<"\n"<<rambo.absolutePath();
+  rambo.rename(oldDirName,newDirName);
 
 }

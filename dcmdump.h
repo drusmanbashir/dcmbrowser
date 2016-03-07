@@ -14,7 +14,10 @@ class DCMDump{
 public:
 
     DCMDump(const QString& dcmFile);
+
     void parse();
+    void anonymize();
+
     QString outputPtID();
     QString outputModality();
     QString outputStudydate();
