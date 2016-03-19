@@ -3,6 +3,7 @@
 #include <string>
 #include <qdebug.h>
 #include <QString>
+
 using namespace std;
 
 
@@ -65,12 +66,13 @@ void DCMDump::parse()
        for( ; it != ds.GetDES().end(); ++it)
          {
 
-         if (it->GetTag()==gdcm::Tag (0x0004, 0x1220))
+         if (it->GetTag()==gdcm::Tag (0x0004, 0x1220))   //DirectoryRecordSequence
            {
 
            const gdcm::DataElement &de = (*it);
-           // ne pas utiliser GetSequenceOfItems pour extraire les items
+           //do not use GetSequenceOfItems to retrieve items
            gdcm::SmartPointer<gdcm::SequenceOfItems> sqi =de.GetValueAsSQ();
+           int number = sqi->GetNumberOfItems();
            unsigned int itemused = 1;
            while (itemused<=sqi->GetNumberOfItems())
 
@@ -80,7 +82,7 @@ void DCMDump::parse()
              if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1430)))
                sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1430)).GetValue().Print(strm);
 
-             //TODO il faut trimer strm.str() avant la comparaison
+
              while((strm.str()=="PATIENT")||((strm.str()=="PATIENT ")))
                {
                  QString tmp = QString::fromStdString(strm.str());
@@ -145,9 +147,8 @@ ptID=tmp;
                      sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0020, 0x000e)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
                    qDebug() << "          SERIE UID" << tmp ;
 
-                   //SERIE MODALITY
                    strm.str("");
-                   if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0008, 0x0060)))
+                   if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0008, 0x0060))) // modality tag
                      sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0008, 0x0060)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
                    qDebug() << "          SERIE MODALITY" << tmp ;
 modality=tmp;
@@ -172,38 +173,38 @@ modality=tmp;
                    tmp = QString::fromStdString(strm.str());
 
 
-                   //TODO il faut trimer strm.str() avant la comparaison
-                   while ((strm.str()=="IMAGE")||((strm.str()=="IMAGE ")))
-                     // if(tmp=="IMAGE")
-                     {
-                  //   qDebug() << "          " << tmp ;
-
-
-                     //UID
-                     strm.str("");
-                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1511)))
-                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1511)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
-                //     qDebug() << "              IMAGE UID : " << tmp ;
-
-                     //PATH de l'image
-                     strm.str("");
-                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1500)))
-                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1500)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
-                //     qDebug() << "              IMAGE PATH : " << tmp ;
-                     /*ADD TAG TO READ HERE*/
+//                   while ((strm.str()=="IMAGE")||((strm.str()=="IMAGE ")))
+//                     {
+//                    QString::fromStdString(strm.str());
+//                     qDebug() << "          " << tmp ;
 
 
 
-                     if(itemused < sqi->GetNumberOfItems())
-                       {itemused++;
-                       }else{break;}
+//                     //UID
+//                     strm.str("");
+//                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1511)))
+//                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1511)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
+//                //     qDebug() << "              IMAGE UID : " << tmp ;
 
-                     strm.str("");
+//                     //PATH de l'image
+//                     strm.str("");
+//                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1500)))
+//                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1500)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
+//                     qDebug() << "              IMAGE PATH : " << tmp ;
+//                     /*ADD TAG TO READ HERE*/
 
-                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1430)))
-                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1430)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
 
-                     }
+
+//                     if(itemused < sqi->GetNumberOfItems())
+//                       {itemused++;
+//                       }else{break;}
+
+//                     strm.str("");
+
+//                     if (sqi->GetItem(itemused).FindDataElement(gdcm::Tag (0x0004, 0x1430)))
+//                       sqi->GetItem(itemused).GetDataElement(gdcm::Tag (0x0004, 0x1430)).GetValue().Print(strm); tmp = QString::fromStdString(strm.str());
+
+//                     }
                    }
                  }
                }
@@ -213,9 +214,16 @@ modality=tmp;
          }
 
 
+
+
 }
 
 void DCMDump::anonymize()
+{
+
+}
+
+void DCMDump::getDetails()
 {
 
 }

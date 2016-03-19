@@ -17,6 +17,7 @@ public:
 
     void parse();
     void anonymize();
+    void getDetails();
 
     QString outputPtID();
     QString outputModality();

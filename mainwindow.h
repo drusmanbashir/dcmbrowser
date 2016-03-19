@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <dcmdump.h>
+#include <dcmanonymizer.h>
 #include <QLabel>
 #include <QFileInfo>
 
@@ -20,10 +21,12 @@ public:
 
 
 
-private slots:
+public slots:
     void openDirBrowser();
+    void openDirBrowser2();
     void about();
     void parseToplevelDir();
+    void anonymizeFiles();
     void renameDirs(const QFileInfo& file);
 
 private:
@@ -35,11 +38,14 @@ private:
     QMenu *fileMenu;
     QMenu *helpMenu;
     QAction *openAct;
+    QAction *anonymizeAct;
     QAction *exitAct;
     QAction *aboutAct;
     QLabel *infoLabel;
     QString toplevelDir;
-
+    DCMAnonymizer *anon;
+    QFile* dataFile;
+    QString outfileName;
     QList<QFileInfo> paths;
 
 };

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDirIterator>
 #include <QListWidget>
+#include <gdcmDICOMDIR.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -18,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createActions();
     createMenus();
 
-    setWindowTitle(tr("Menus"));
+    setWindowTitle(tr("DICOM browser"));
     setMinimumSize(160,160);
     resize(480,320);
 
@@ -37,11 +38,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::createActions()
 {
-        openAct = new QAction(tr("&Select Directory"), this);
+        openAct = new QAction(tr("&Rename Directory"), this);
         openAct->setShortcuts(QKeySequence::Open);
         openAct->setStatusTip(tr("Select a top-level DICOM directory"));
         connect(openAct, SIGNAL(triggered()), this, SLOT(openDirBrowser()));
 
+        anonymizeAct = new QAction(tr("&Anonymize DICOM files"), this);
+        anonymizeAct->setShortcuts(QKeySequence::New);
+        anonymizeAct->setStatusTip(tr("Select a top-level DICOM directory"));
+        connect(anonymizeAct, SIGNAL(triggered()), this, SLOT(openDirBrowser2()));
 
         exitAct = new QAction(tr("E&xit"), this);
             exitAct->setShortcuts(QKeySequence::Quit);
@@ -57,6 +62,7 @@ void MainWindow::createMenus()
 {
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(openAct);
+    fileMenu->addAction(anonymizeAct);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
@@ -75,23 +81,29 @@ void MainWindow::about()
 
 void MainWindow::openDirBrowser()
 {
-//QFileDialog dialog(this);
-
-//dialog.setFileMode(QFileDialog::Directory);
-
-//if(dialog.exec()){
-//    toplevelDir=dialog.getExistingDirectory();
-    //}
 
  toplevelDir=   QFileDialog::getExistingDirectory(
             this,
-            tr("Select a Directory"),  QDir::currentPath(),
+            tr("Select a Directory to rename"),  QDir::currentPath(),
              QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks
           );
         if( !toplevelDir.isNull() )
         {
             parseToplevelDir();
-          qDebug()<<toplevelDir;
+        }
+}
+
+void MainWindow::openDirBrowser2()
+{
+
+ toplevelDir=   QFileDialog::getExistingDirectory(
+            this,
+            tr("Select a Directory to anonymize"),  QDir::currentPath(),
+             QFileDialog::ShowDirsOnly|QFileDialog::DontResolveSymlinks
+          );
+        if( !toplevelDir.isNull() )
+        {
+                          anonymizeFiles();
         }
 }
 
@@ -101,12 +113,14 @@ void MainWindow::parseToplevelDir(){
 QStringList tmp;
 
     QDirIterator it(toplevelDir,  QStringList()<<"DICOMDIR",QDir::Files,QDirIterator::Subdirectories);
+     tmp<<it.filePath();
+            qDebug()<<it.next();
     while (it.hasNext()){
 
-
-            qDebug()<<it.next();
      paths<<  it.fileInfo();
      tmp<<it.filePath();
+
+            qDebug()<<it.next();
 
     }
     QListWidget *display = new QListWidget();
@@ -115,20 +129,65 @@ QStringList tmp;
 
 
     QListIterator<QFileInfo> i(paths);
+     dataFile= new QFile("summary.csv");
+   if(dataFile->open(QFile::WriteOnly|QFile::Truncate)){
     while (i.hasNext()){
-        renameDirs(i.next());
+
+        renameDirs(i.next());  //javastyle iterator positioned between items and returns the previous item so first item gets returned with the first call!
     }
+   }
+    dataFile->close();
 }
 
 void MainWindow::renameDirs(const QFileInfo& file){
+
    QDir rambo(file.absoluteDir());
    QFileInfo newName ;
    DCMDump dump(file.absoluteFilePath());
    QString oldDirName = file.absolutePath();
    rambo.cdUp();
    QString newDirName = rambo.path()+"/"+dump.outputPtID()+"_"+dump.outputModality()+"_"+dump.outputStudydate();
+
+       QTextStream output(dataFile);
+       output<<oldDirName<<"\tNew name: "<<newDirName<<"\n";
+
+
    qDebug()<<oldDirName<<"\n"<<newDirName;
    qDebug()<<"Dirname:"<<rambo.dirName()<<"\n"<<rambo.absolutePath();
   rambo.rename(oldDirName,newDirName);
 
 }
+
+void MainWindow::anonymizeFiles(){
+QStringList tmp;
+    QDirIterator it(toplevelDir, QStringList()<<"*.dcm",QDir::Files |QDir::NoDotAndDotDot,QDirIterator::Subdirectories);
+    while (it.hasNext()){
+
+
+            qDebug()<<it.next();
+if(it.fileName()=="DICOMDIR"){
+
+    qDebug()<<"\nThis is a DICOMDIR file..";
+
+
+//    anon = new DCMAnonymizer(it.filePath());
+//    anon->anonymizeDICOMDIR();
+
+
+
+
+}
+else{
+
+ anon = new DCMAnonymizer(it.filePath());
+ anon->anonymize();
+}
+    }
+
+
+//
+
+    }
+
+
+
